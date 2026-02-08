@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #0f172a;
+            color: #fff;
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px 5px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background: #2563eb;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #1e293b;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        .error {
+            color: #ef4444;
+        }
+        .success {
+            color: #10b981;
+        }
+    </style>
+</head>
+<body>
+    <h1>API Route Test</h1>
+    <p>Click the buttons below to test if the API routes are working:</p>
+    
+    <button onclick="testUsersGet()">Test GET /api/users</button>
+    <button onclick="testAlertsGet()">Test GET /api/alerts</button>
+    <button onclick="testUsersPost()">Test POST /api/users (Create User)</button>
+    
+    <div id="result"></div>
+
+    <script>
+        const resultDiv = document.getElementById('result');
+
+        async function testUsersGet() {
+            resultDiv.innerHTML = 'Testing GET /api/users...';
+            try {
+                const response = await fetch('/api/users');
+                const data = await response.json();
+                resultDiv.innerHTML = `<span class="success">✓ Success!</span>\n\nStatus: ${response.status}\nResponse:\n${JSON.stringify(data, null, 2)}`;
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">✗ Error!</span>\n\n${error.message}\n\nThis is the JSON parse error you're seeing!`;
+            }
+        }
+
+        async function testAlertsGet() {
+            resultDiv.innerHTML = 'Testing GET /api/alerts...';
+            try {
+                const response = await fetch('/api/alerts');
+                const data = await response.json();
+                resultDiv.innerHTML = `<span class="success">✓ Success!</span>\n\nStatus: ${response.status}\nResponse:\n${JSON.stringify(data, null, 2)}`;
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">✗ Error!</span>\n\n${error.message}`;
+            }
+        }
+
+        async function testUsersPost() {
+            resultDiv.innerHTML = 'Testing POST /api/users...';
+            try {
+                const testUser = {
+                    email: 'test' + Date.now() + '@example.com',
+                    password: 'password123',
+                    name: 'Test User',
+                    role: 'donor',
+                    bloodGroup: 'O+'
+                };
+                
+                const response = await fetch('/api/users', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(testUser)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `<span class="success">✓ Success! User created!</span>\n\nStatus: ${response.status}\nResponse:\n${JSON.stringify(data, null, 2)}`;
+                } else {
+                    resultDiv.innerHTML = `<span class="error">✗ API Error</span>\n\nStatus: ${response.status}\nResponse:\n${JSON.stringify(data, null, 2)}`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">✗ Error!</span>\n\n${error.message}\n\nThis means the API is returning HTML instead of JSON!`;
+            }
+        }
+    </script>
+</body>
+</html>

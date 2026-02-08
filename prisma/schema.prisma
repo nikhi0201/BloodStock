@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String
+  role          String    // "donor" | "hospital" | "admin"
+  name          String?
+  
+  // Donor Specific
+  bloodGroup    String?
+  lat           Float?
+  lng           Float?
+  isAvailable   Boolean   @default(true)
+  lastDonation  DateTime?
+  
+  // Hospital Specific
+  hospitalName  String?
+  licenseId     String?
+  address       String?
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  alerts        Alert[]
+}
+
+model Alert {
+  id          String   @id @default(cuid())
+  hospitalId  String
+  hospital    User     @relation(fields: [hospitalId], references: [id])
+  bloodGroup  String
+  lat         Float
+  lng         Float
+  description String?
+  status      String   @default("active") // active, resolved
+  createdAt   DateTime @default(now())
+}
